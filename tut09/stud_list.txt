@@ -1,9 +1,3 @@
-# CS384_2024
-
-Tuts Assignments for CS384 2024 Lab & Porject - July Dec 2024
-
-List of Students Registered
-
 2201CB05 Ade Balakrishna
 2201CB11 Anvaya Sharma
 2201CB19 Chhavi Bamoriya
@@ -139,7 +133,6 @@ List of Students Registered
 2201MM26 Rudra Goyal
 2201MM27 Gosukonda Sai Venkata Yeshwanth
 2201MM37 Arpan Patel
-2201MM39 Raunak Bansod
 2201MM40 Manoj Kumhar
 2201PH01 Adhila Aslam
 2201PH03 Aditya Kumar Singh

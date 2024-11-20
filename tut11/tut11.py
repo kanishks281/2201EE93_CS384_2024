@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from io import BytesIO
+
 # Function to process the uploaded file
 def process_file_with_scaling(file, scale_min=0, scale_max=100):
     df = pd.read_excel(file)
@@ -81,6 +82,18 @@ def process_file_with_scaling(file, scale_min=0, scale_max=100):
 
     return output1, output2, student_df[['Roll', 'Name', 'Grand Total', 'Grade', 'Scaled Marks']], grade_stats
 
+# Function to generate the IAPC vs Generated Grade Comparison table
+def generate_iapc_comparison(iapc_counts, grade_stats):
+    # Merge the IAPC counts with the grade statistics
+    comparison_df = pd.DataFrame(iapc_counts)
+    comparison_df = pd.merge(comparison_df, grade_stats[['Grade', 'Count']], on='Grade', how='left')
+    comparison_df.rename(columns={'Count': 'Generated Count'}, inplace=True)
+
+    # Fill missing values and calculate the difference
+    comparison_df['Generated Count'] = comparison_df['Generated Count'].fillna(0).astype(int)
+    comparison_df['Difference'] = comparison_df['Generated Count'] - comparison_df['IAPC Count']
+
+    return comparison_df
 
 # Streamlit app layout and functionality
 st.title("Excel Grading with Scaled Marks")
@@ -101,6 +114,15 @@ if uploaded_file is not None:
     st.write("### Grand Total, Grades, and Scaled Marks")
     st.dataframe(scaled_table)
 
+    # Display the IAPC vs Generated Grade Comparison table
+    iapc_counts = {
+        'Grade': ['AA', 'AB', 'BB', 'BC', 'CC', 'CD', 'DD', 'F'],
+        'IAPC Count': [5, 15, 25, 30, 15, 5, 5, 0]  # Replace with actual IAPC counts
+    }
+    iapc_comparison = generate_iapc_comparison(iapc_counts, grade_stats)
+    st.write("### IAPC vs Generated Grade Comparison Table")
+    st.dataframe(iapc_comparison)
+
     # Provide download links for the two output files
     st.download_button(
         label="Download Grand Total and Grades",
@@ -113,5 +135,16 @@ if uploaded_file is not None:
         label="Download Sorted by Roll",
         data=output2,
         file_name="output_roll_scaled.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    # Provide download link for the IAPC comparison table
+    iapc_output = BytesIO()
+    iapc_comparison.to_excel(iapc_output, index=False, engine='openpyxl')
+    iapc_output.seek(0)
+    st.download_button(
+        label="Download IAPC Comparison Table",
+        data=iapc_output,
+        file_name="iapc_comparison.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )

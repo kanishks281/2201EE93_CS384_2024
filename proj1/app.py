@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 # Define a base directory for saving outputs
 OUTPUT_DIR = "output"
+os.makedirs(OUTPUT_DIR, exist_ok=True)  # Ensure the output directory exists
 
 @app.route('/')
 def index():
@@ -145,7 +146,25 @@ def submit():
     # Create consolidated Excel file
     consolidated_file_path = os.path.join(OUTPUT_DIR, "consolidated.xlsx")
     all_data_df = pd.concat(all_data, ignore_index=True)
-    all_data_df.to_excel(consolidated_file_path, index=False, sheet_name='All Data')
+
+    # Group data for consolidated output
+    consolidated_data = []
+    for (date, day, course, room), group in all_data_df.groupby(['Date', 'Session', 'Course', 'Room']):
+        roll_list = ";".join(group['Roll No.'].astype(str).tolist())
+        consolidated_data.append({
+            'Date': date,
+            'Day': day,
+            'course_code': course,
+            'Room': room,
+            'Allocated_students_count': len(group),
+            'Roll_list (semicolon separated_)': roll_list
+        })
+
+    # Create a DataFrame for consolidated data
+    consolidated_df = pd.DataFrame(consolidated_data)
+
+    # Save to Excel
+    consolidated_df.to_excel(consolidated_file_path, index=False, sheet_name='Consolidated Data')
 
     # Render output page with the list of generated files
     return render_template('output.html', files=file_paths + [consolidated_file_path])

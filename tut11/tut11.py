@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from io import BytesIO
+from PIL import Image
 
 # Function to process the uploaded file
 def process_file_with_scaling(file, scale_min=0, scale_max=100):
@@ -99,6 +100,12 @@ def generate_iapc_comparison(iapc_counts, grade_stats):
 st.title("Excel Grading with Scaled Marks")
 
 st.write("Upload an Excel file to calculate 'Grand Total', assign grades, and compute scaled marks based on the provided formula.")
+
+# Display the formula image
+st.write("### Scaling Formula")
+image_path = "C:/Users/Dell/OneDrive/Documents/2201EE93_CS384_2024/tut11/WhatsApp Image 2024-11-21 at 18.34.17_51ddb3ba.jpg"
+image = Image.open(image_path)
+st.image(image, caption="Scaling Formula", use_container_width=True)
 
 uploaded_file = st.file_uploader("Choose an Excel file", type="xlsx")
 
